@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIMQUEST — Master Vim Motions</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <!-- ==================== WORLD MAP / MENU VIEW ==================== -->
+    <section id="view-menu" class="view view-menu active">
+      <header class="menu-header">
+        <div class="brand">
+          <div class="brand-emblem" aria-hidden="true">
+            <span class="emblem-key">V</span>
+          </div>
+          <div>
+            <h1 class="brand-title">VIMQUEST</h1>
+            <p class="brand-sub">Arcade-Paced Vim Motions, Search &amp; Refactoring Mastery</p>
+          </div>
+        </div>
+        <div class="menu-stats-bar">
+          <div class="stat-pill stat-stars" id="menu-stars-total">0 / 72 ★</div>
+          <label class="toggle-pill" title="Unlock every level to jump anywhere freely">
+            <input type="checkbox" id="toggle-unlock-all" />
+            <span>Unlock All</span>
+          </label>
+          <button type="button" class="btn btn-ghost" id="btn-menu-cheatsheet">
+            Cheat Sheet &amp; Mastery <kbd>F1</kbd>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon" id="btn-menu-mute" title="Toggle Sound">🔊</button>
+        </div>
+      </header>
+
+      <div class="menu-hero-actions">
+        <button type="button" class="btn btn-primary btn-lg" id="btn-continue-quest">
+          Continue Campaign
+        </button>
+        <div class="arcade-launcher">
+          <span class="arcade-label">⚡ Arcade Blitz (60s):</span>
+          <button type="button" class="btn btn-emerald" data-arcade="apprentice">Apprentice</button>
+          <button type="button" class="btn btn-amber" data-arcade="adept">Adept</button>
+          <button type="button" class="btn btn-rose" data-arcade="master">Master</button>
+        </div>
+        <button type="button" class="btn btn-violet" id="btn-open-sandbox">
+          🧪 Free Sandbox
+        </button>
+      </div>
+
+      <div id="chapters-grid" class="chapters-grid"></div>
+    </section>
+
+    <!-- ==================== GAMEPLAY ARENA VIEW ==================== -->
+    <section id="view-arena" class="view view-arena">
+      <header class="arena-topbar" id="arena-topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-back-map" title="World Map">← Map</button>
+          <div class="level-badge" id="hud-level-badge">Ch 1 • L1</div>
+          <div class="level-title" id="hud-level-title">First Steps</div>
+        </div>
+
+        <div class="topbar-center" id="hud-boss-bar-wrap">
+          <div class="boss-hud hidden" id="hud-boss-hud">
+            <span class="boss-name" id="hud-boss-name">BOSS</span>
+            <div class="boss-hp-track">
+              <div class="boss-hp-fill" id="hud-boss-hp"></div>
+            </div>
+            <span class="boss-timer" id="hud-timer">45.0s</span>
+          </div>
+          <div class="arcade-hud hidden" id="hud-arcade-hud">
+            <span class="arcade-badge" id="hud-arcade-wave">WAVE 1</span>
+            <span class="arcade-cleared" id="hud-arcade-cleared">0 Cleared</span>
+            <span class="boss-timer" id="hud-arcade-timer">60.0s</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="metric-chip" title="Keystrokes used vs 3-Star PAR">
+            <span class="metric-label">KEYS</span>
+            <span class="metric-val" id="hud-keys">0 / 9</span>
+          </div>
+          <div class="metric-chip metric-combo" id="hud-combo-chip">
+            <span class="metric-label">COMBO</span>
+            <span class="metric-val" id="hud-combo">0x</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">SCORE</span>
+            <span class="metric-val" id="hud-score">0</span>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-hint" title="Show Next Hint (Tab)">
+            Hint <kbd>Tab</kbd>
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-restart" title="Restart Level">↺ Restart</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-toggle-rel" title="Toggle Relative Line Numbers">Rel#</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-arena-cheatsheet" title="Cheat Sheet & Mastery (F1)">
+            Help <kbd>F1</kbd>
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm btn-icon" id="btn-arena-mute" title="Toggle Sound">🔊</button>
+        </div>
+      </header>
+
+      <div class="mission-banner" id="mission-banner">
+        <div class="mission-main">
+          <div class="mission-brief" id="mission-brief"></div>
+          <div class="mission-keys" id="mission-keys"></div>
+        </div>
+        <div class="mission-objectives hidden" id="mission-objectives"></div>
+        <div class="mission-hint hidden" id="mission-hint"></div>
+      </div>
+
+      <main class="editor-stage" id="editor-stage">
+        <div class="editor-window" id="editor-window">
+          <div class="editor-chrome">
+            <div class="chrome-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-amber"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <div class="chrome-filename" id="chrome-filename">awakening.js</div>
+            <div class="chrome-progress" id="chrome-progress">0 / 3 Gems</div>
+          </div>
+
+          <div class="editor-body" id="editor-body" tabindex="0">
+            <div class="gutter" id="editor-gutter" aria-hidden="true"></div>
+            <div class="code-stage" id="code-stage">
+              <svg class="trail-svg" id="trail-svg" aria-hidden="true"></svg>
+              <div class="cursor-knight mode-normal" id="cursor-knight" aria-hidden="true"></div>
+              <div class="code-grid" id="code-grid"></div>
+              <div class="float-layer" id="float-layer" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="vim-statusline" id="vim-statusline">
+            <span class="mode-badge mode-normal" id="status-mode">NORMAL</span>
+            <span class="status-file" id="status-file">awakening.js</span>
+            <span class="status-center" id="status-center"></span>
+            <span class="status-pending" id="status-pending"></span>
+            <span class="status-tape" id="status-tape"></span>
+            <span class="status-pos" id="status-pos">Ln 1, Col 1</span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="key-guide-bar" id="key-guide-bar"></footer>
+    </section>
+
+    <!-- ==================== MODAL OVERLAY ==================== -->
+    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+      <div class="modal-card" id="modal-card"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

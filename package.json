@@ -1,0 +1,10 @@
+{
+  "name": "vimquest",
+  "version": "1.0.0",
+  "description": "VIMQUEST — An interactive arcade game that teaches authentic Vim motions, search, operators, and text objects.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/vim-engine.test.js"
+  }
+}
